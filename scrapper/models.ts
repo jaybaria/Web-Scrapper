@@ -20,13 +20,18 @@ export async function insertProductInfo(productInfo: ProductInfo[]) {
     let upsertedCount = 0;
     let modifiedCount = 0;
     const timestamp = new Date();
-    let id = 1;
+    const usedIds = new Set<number>();
     for (const product of productInfo) {
+      let id = 1;
+      while (usedIds.has(id)) {
+        id++;
+      }
+      usedIds.add(id);
       const filter = { product_name: product.product_name };
       const options = { upsert: true };
       const update = {
         $setOnInsert: { created_at: timestamp },
-        $set: { updated_at: timestamp, ...product, id: id++ },
+        $set: { updated_at: timestamp, ...product, id },
       };
       const { modifiedCount: mc, upsertedCount: uc } =
         await collection.updateMany(filter, update, options);

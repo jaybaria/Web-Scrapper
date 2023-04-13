@@ -1,9 +1,13 @@
 import { Router, Request, Response } from "express";
-import { getProductByID, readAllProducts, readDetails } from "./controller";
+import {
+  getProductByID,
+  readAllProducts,
+  scrapeProductDetails,
+} from "./controller";
 
 const router = Router();
 
-router.post("/api/products", readDetails);
+router.post("/api/products", scrapeProductDetails);
 router.get("/api/products/all", readAllProducts);
 router.get("/api/products/:id", getProductByID);
 

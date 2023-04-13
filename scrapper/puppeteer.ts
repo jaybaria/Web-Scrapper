@@ -40,7 +40,7 @@ export async function puppeteerScrapper(website_link: string) {
     });
     // limited to only 2 hrefs for testing
     const uniqueHrefs = Array.from(new Set(filteredHrefs));
-    return uniqueHrefs.slice(0, 10);
+    return uniqueHrefs.slice(0, 5);
   }, hrefStrings);
 
   // Create an array to store the product information
@@ -108,7 +108,7 @@ export async function puppeteerScrapper(website_link: string) {
         const veg_non_veg = tds[brand_index + 1].querySelector("li");
         return veg_non_veg ? veg_non_veg.textContent.trim() : null;
       });
-
+      let id = 1;
       productInfo.push({
         product_name,
         image_links,
@@ -126,6 +126,6 @@ export async function puppeteerScrapper(website_link: string) {
   }
 
   await browser.close();
-  await insertProductInfo(productInfo);
+
   return { productInfo };
 }

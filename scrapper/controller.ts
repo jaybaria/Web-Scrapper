@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { input_schema, number_validation } from "./validation";
 import { puppeteerScrapper } from "./puppeteer";
-import { getAllProducts, getProductById } from "./models";
+import { getAllProducts, getProductById, insertProductInfo } from "./models";
 
-export async function readDetails(req: Request, res: Response) {
+export async function scrapeProductDetails(req: Request, res: Response) {
   try {
     const { error, value } = input_schema.validate(req.body);
     if (error) {
@@ -14,7 +14,7 @@ export async function readDetails(req: Request, res: Response) {
     if (!products) {
       return res.status(400).json("Unable to Scrape Data");
     }
-
+    await insertProductInfo(products.productInfo);
     return res.status(200).json(products);
   } catch (error) {
     console.error(`Got Error Inserting Product Details: ${error}`);
@@ -41,12 +41,12 @@ export async function getProductByID(req: Request, res: Response) {
     const id = parseInt(req.params.id);
     const product = await getProductById(id);
     if (!product) {
-      res.status(400).send("Unable to Find Product");
+      return res.status(400).send("Unable to Find Product");
     }
-    res.status(200).json(product);
+    return res.status(200).json(product);
   } catch (error) {
     console.error(`Error fetching product: ${error}`);
-    res.status(500).send("Internal server error");
+    return res.status(500).send("Internal server error");
   }
 }
 
