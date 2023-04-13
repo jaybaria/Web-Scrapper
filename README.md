@@ -55,6 +55,8 @@ To get started with this project, follow the steps below:
 **POST /api/products**
 
 - Insert Website link to Retrive Informations.
+- [https://www.flipkart.com/grocery/packaged-food/pr?sid=73z%2Cu0u&marketplace=GROCERY](https://www.flipkart.com/grocery/packaged-food/pr?sid=73z%2Cu0u&marketplace=GROCERY)
+- Please Use This link In Request Body For now
 
 ![RESTAPI Image ](https://github.com/jaybaria/Web-Scrapper/blob/main/images/RestAPI.png)
 
