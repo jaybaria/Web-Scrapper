@@ -32,13 +32,11 @@ To get started with this project, follow the steps below:
 
 - Create a .env file in the root directory of the project and add the following environment variables:
 
-- makefile
-
-- Copy code
-
+```
 - MONGODB_URI=<your_mongodb_uri>
 
 - PORT=<port_number>
+```
 
 - Start the server by running npm start.
 
