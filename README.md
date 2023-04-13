@@ -56,6 +56,8 @@ To get started with this project, follow the steps below:
 
 - Insert Website link to Retrive Informations.
 
+![RESTAPI Image ](https://github.com/jaybaria/Web-Scrapper/blob/main/images/RestAPI.png)
+
 ### **Request/Response Examples**
 
 **Request:** - **GET /api/products**
