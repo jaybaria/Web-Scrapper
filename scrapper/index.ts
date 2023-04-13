@@ -33,7 +33,7 @@ router.get("/api/products/:id", getProductByID);
  *             properties:
  *               website_link:
  *                 type: string
- *                 example: "www.google.com"
+ *                 example: "https://www.google.com"
  *     responses:
  *       201:
  *         description: Successfully Fetched Data.
