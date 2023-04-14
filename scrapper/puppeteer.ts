@@ -16,41 +16,40 @@ export async function puppeteerScrapper(website_link: string) {
   const inputField = await page.waitForSelector("input._166SQN");
   await inputField.type("400001");
   await page.keyboard.press("Enter");
-  await page.waitForTimeout(15000);
-  await page.setDefaultNavigationTimeout(40000);
+  await Promise.all([page.keyboard.press("Enter"), page.waitForNavigation()]);
+  // await page.waitForTimeout(15000);
+  // await page.setDefaultNavigationTimeout(40000);
 
   // Find all href links
-  const hrefElements = await page.$$('div[class^="_1AtVbE col-12-12"] a');
-  const hrefs = await Promise.all(
-    hrefElements.map((el: { getProperty: (arg0: string) => any }) =>
-      el.getProperty("href")
-    )
+  const products = await page.$$eval(
+    'div[class^="_1AtVbE col-12-12"] a',
+    (hrefElements: any[]) => {
+      const hrefs = hrefElements.map((el) => el.href);
+      const filteredHrefs = hrefs.filter((href) => {
+        return (
+          href.startsWith("https://www.flipkart.com/") &&
+          !href.includes("/grocery/packaged-food/pr?")
+        );
+      });
+      // limited to only 5 hrefs for testing
+      const uniqueHrefs = Array.from(new Set(filteredHrefs));
+      return uniqueHrefs.slice(0, 5);
+    }
   );
-  const hrefStrings = await Promise.all(hrefs.map((href) => href.jsonValue()));
-
-  // Filter out unwanted hrefs and limit the number of hrefs to 2 for testing
-  const products = await page.evaluate((hrefs: any[]) => {
-    const filteredHrefs = hrefs.filter((href: string) => {
-      return (
-        href.startsWith("https://www.flipkart.com/") &&
-        !href.includes("/grocery/packaged-food/pr?")
-      );
-    });
-    // limited to only 2 hrefs for testing
-    const uniqueHrefs = Array.from(new Set(filteredHrefs));
-    return uniqueHrefs.slice(0, 5);
-  }, hrefStrings);
 
   // Create an array to store the product information
   const productInfo: ProductInfo[] = [];
 
   for (const productLink of products) {
     try {
-      const product_link = await page.goto(productLink);
+      const product_page = await browser.newPage();
+      const product_link = await product_page.goto(productLink);
 
-      const product_name = await page.$eval(".B_NuCI", (el: any) =>
-        el.textContent.trim()
-      );
+      const product_name = await product_page
+        .evaluateHandle(() =>
+          document.querySelector(".B_NuCI")?.textContent?.trim()
+        )
+        .then((handle: { jsonValue: () => any }) => handle.jsonValue());
 
       const product_price = await page.$eval("._30jeq3._16Jk6d", (el: any) =>
         el.textContent.trim()
