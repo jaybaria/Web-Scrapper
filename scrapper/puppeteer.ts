@@ -45,7 +45,8 @@ export async function puppeteerScrapper(website_link: string) {
 
   for (const productLink of products) {
     try {
-      const product_link = await page.goto(productLink);
+      await page.goto(productLink);
+      const product_link = productLink;
 
       const product_name = await page.$eval(".B_NuCI", (el: any) =>
         el.textContent.trim()
