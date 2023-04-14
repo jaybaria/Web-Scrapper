@@ -14,7 +14,9 @@ export async function scrapeProductDetails(req: Request, res: Response) {
     if (!products) {
       return res.status(400).json("Unable to Scrape Data");
     }
+
     await insertProductInfo(products.productInfo);
+
     return res.status(200).json(products);
   } catch (error) {
     console.error(`Got Error Inserting Product Details: ${error}`);

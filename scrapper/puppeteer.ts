@@ -58,11 +58,15 @@ export async function puppeteerScrapper(website_link: string) {
         el.textContent.trim()
       );
 
-      // look into this
-      // const description = await page.$eval(
-      //   "div._1mXcCf",
-      //   (el: { textContent: string }) => el.textContent.trim()
-      // );
+      let description;
+      try {
+        description = await page.$eval(
+          "div._1mXcCf",
+          (el: { textContent: string }) => el.textContent.trim()
+        );
+      } catch (error) {
+        description = "N/A";
+      }
 
       const image_links = await page.evaluate(() => {
         const image_index = document.querySelectorAll("div._2mLllQ img.q6DClP");
@@ -108,11 +112,11 @@ export async function puppeteerScrapper(website_link: string) {
         const veg_non_veg = tds[brand_index + 1].querySelector("li");
         return veg_non_veg ? veg_non_veg.textContent.trim() : null;
       });
-      let id = 1;
+
       productInfo.push({
         product_name,
         image_links,
-        //description,
+        description,
         brand_name,
         product_price,
         quantity,

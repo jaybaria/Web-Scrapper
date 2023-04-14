@@ -8,6 +8,7 @@ export interface ProductInfo {
   brand_name: string;
   product_price: number;
   quantity: string;
+  description: string;
   ingredients: string[];
   nutritions: string[];
   veg_non_veg: string;
@@ -17,30 +18,58 @@ export async function insertProductInfo(productInfo: ProductInfo[]) {
   const db: Db = await connectToDatabase();
   try {
     const collection = db.collection("products");
-    let upsertedCount = 0;
-    let modifiedCount = 0;
     const timestamp = new Date();
-    const usedIds = new Set<number>();
-    for (const product of productInfo) {
-      let id = 1;
-      while (usedIds.has(id)) {
-        id++;
+
+    // Fetch all existing products from the database and create a map using product name and price as the key,
+    // so that it can be used to check if a product with the same name and price already exists in the database.
+    // This will help in preventing insertion of duplicate records.
+    const existing_products = await collection.find({}).toArray();
+    const existing_product_map = new Map<string, ProductInfo>();
+    existing_products.forEach((product) => {
+      existing_product_map.set(
+        `${product.product_name}-${product.product_price}`,
+        product as unknown as ProductInfo
+      );
+    });
+
+    let highest_id = 0;
+    existing_products.forEach((product) => {
+      if (product.id > highest_id) {
+        highest_id = product.id;
       }
-      usedIds.add(id);
-      const filter = { product_name: product.product_name };
-      const options = { upsert: true };
-      const update = {
-        $setOnInsert: { created_at: timestamp },
-        $set: { updated_at: timestamp, ...product, id },
+    });
+    let next_id = highest_id + 1;
+
+    for (const product of productInfo) {
+      const key = `${product.product_name}-${product.product_price}`;
+
+      if (existing_product_map.has(key)) {
+        // console.log(
+        //   `Product with name ${product.product_name} and price ${product.product_price} already exists in database.`
+        // );
+        continue;
+      }
+
+      const new_product = {
+        ...product,
+        id: next_id,
+        created_at: timestamp,
+        updated_at: timestamp,
       };
-      const { modifiedCount: mc, upsertedCount: uc } =
-        await collection.updateMany(filter, update, options);
-      modifiedCount += mc;
-      upsertedCount += uc;
+
+      const inserted_records = await collection.insertOne(new_product);
+
+      if (inserted_records.acknowledged) {
+        if (inserted_records.insertedId) {
+          console.log(`Inserted 1 record with id ${next_id}`);
+          next_id++;
+        } else {
+          console.log("No record inserted");
+        }
+      } else {
+        console.log("Error inserting record");
+      }
     }
-    console.log(
-      `${upsertedCount} Documents Updated And ${modifiedCount} Documents Modified`
-    );
   } catch (err) {
     console.error(`Got Error While Inserting Documents: ${err}`);
   }
