@@ -12,6 +12,7 @@ export interface ProductInfo {
   ingredients: string[];
   nutritions: string[];
   veg_non_veg: string;
+  product_link: string;
 }
 
 export async function insertProductInfo(productInfo: ProductInfo[]) {

@@ -27,6 +27,9 @@ export async function scrapeProductDetails(req: Request, res: Response) {
 export async function readAllProducts(req: Request, res: Response) {
   try {
     const products = await getAllProducts();
+    if (!products) {
+      res.status(400).json({ message: "Please Fetched Records First" });
+    }
     res.json(products);
   } catch (error) {
     console.error(`Got Error While Reading All Products: ${error}`);

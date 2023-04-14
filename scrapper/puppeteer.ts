@@ -1,8 +1,6 @@
-import { ProductInfo, insertProductInfo } from "./models";
+import { ProductInfo } from "./models";
 
 const puppeteer = require("puppeteer");
-const jsdom = require("jsdom");
-const { JSDOM } = jsdom;
 
 export async function puppeteerScrapper(website_link: string) {
   // Launch the browser
@@ -48,7 +46,7 @@ export async function puppeteerScrapper(website_link: string) {
 
   for (const productLink of products) {
     try {
-      await page.goto(productLink);
+      const product_link = await page.goto(productLink);
 
       const product_name = await page.$eval(".B_NuCI", (el: any) =>
         el.textContent.trim()
@@ -123,6 +121,7 @@ export async function puppeteerScrapper(website_link: string) {
         ingredients,
         nutritions,
         veg_non_veg,
+        product_link,
       });
     } catch (error) {
       console.log(`Error while scraping product ${productLink}:`, error);
