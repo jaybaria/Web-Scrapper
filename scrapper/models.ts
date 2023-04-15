@@ -1,6 +1,6 @@
-import { Db, ObjectId, WithId } from "mongodb";
-import connectToDatabase from "./db_connection";
+import { WithId } from "mongodb";
 import { Document } from "bson";
+import { db } from "..";
 
 export interface ProductInfo {
   product_name: string;
@@ -16,7 +16,6 @@ export interface ProductInfo {
 }
 
 export async function insertProductInfo(productInfo: ProductInfo[]) {
-  const db: Db = await connectToDatabase();
   try {
     const collection = db.collection("products");
     const timestamp = new Date();
@@ -78,7 +77,6 @@ export async function insertProductInfo(productInfo: ProductInfo[]) {
 
 export async function getAllProducts(): Promise<ProductInfo[]> {
   try {
-    const db: Db = await connectToDatabase();
     const collection = db.collection("products");
     const productsInDb: WithId<Document>[] = await collection.find().toArray();
     const products: ProductInfo[] = productsInDb.map(
@@ -96,7 +94,6 @@ export async function getAllProducts(): Promise<ProductInfo[]> {
 
 export async function getProductById(id: number): Promise<ProductInfo | null> {
   try {
-    const db: Db = await connectToDatabase();
     const collection = db.collection<ProductInfo>("products");
 
     const product: ProductInfo | null = await collection.findOne({ id });

@@ -17,7 +17,7 @@ export async function scrapeProductDetails(req: Request, res: Response) {
 
     await insertProductInfo(products.productInfo);
 
-    return res.status(200).json(products);
+    return res.status(200).json(products.productInfo);
   } catch (error) {
     console.error(`Got Error Inserting Product Details: ${error}`);
     res.status(500).json({ error: "Something went wrong!" });

@@ -66,7 +66,7 @@ router.get("/api/products/:id", getProductByID);
  * @swagger
  * /api/products/{id}:
  *   get:
- *     summary: Create a new food product
+ *     summary: Get food product By ID
  *     tags: [Products]
  *     parameters:
  *       - name: id

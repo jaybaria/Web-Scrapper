@@ -12,33 +12,35 @@ export async function puppeteerScrapper(website_link: string) {
   await page.goto(website_link);
 
   // Inserting the pin-code to check for delivery serviceability
-  const inputField = await page.waitForSelector("input._166SQN");
-  await inputField.type("400001");
+  const input_field = await page.waitForSelector("input._166SQN");
+  await input_field.type("400001");
   await page.keyboard.press("Enter");
   await page.waitForTimeout(15000);
   await page.setDefaultNavigationTimeout(40000);
 
   // Find all href links
-  const hrefElements = await page.$$('div[class^="_1AtVbE col-12-12"] a');
+  const href_elements = await page.$$('div[class^="_1AtVbE col-12-12"] a');
   const hrefs = await Promise.all(
-    hrefElements.map((el: { getProperty: (arg0: string) => any }) =>
+    href_elements.map((el: { getProperty: (arg0: string) => any }) =>
       el.getProperty("href")
     )
   );
-  const hrefStrings = await Promise.all(hrefs.map((href) => href.jsonValue()));
+  const href_strings = await Promise.all(
+    hrefs.map((product_href) => product_href.jsonValue())
+  );
 
   // Filter out unwanted hrefs and limit the number of hrefs to 2 for testing
   const products = await page.evaluate((hrefs: any[]) => {
-    const filteredHrefs = hrefs.filter((href: string) => {
+    const filtered_hrefs = hrefs.filter((href: string) => {
       return (
         href.startsWith("https://www.flipkart.com/") &&
         !href.includes("/grocery/packaged-food/pr?")
       );
     });
     // limited to only 2 hrefs for testing
-    const uniqueHrefs = Array.from(new Set(filteredHrefs));
-    return uniqueHrefs.slice(0, 5);
-  }, hrefStrings);
+    const unique_hrefs = Array.from(new Set(filtered_hrefs));
+    return unique_hrefs.slice(0, 5);
+  }, href_strings);
 
   // Create an array to store the product information
   const productInfo: ProductInfo[] = [];
@@ -76,7 +78,7 @@ export async function puppeteerScrapper(website_link: string) {
           (td: { textContent: string }) => td.textContent === "Brand"
         );
         const brand_name = tds[brand_index + 1].querySelector("li");
-        return brand_name ? brand_name.textContent.trim() : null;
+        return brand_name ? brand_name.textContent.trim() : "N/A";
       });
 
       const quantity = await page.$$eval("tr td", (tds: any[]) => {
@@ -84,7 +86,7 @@ export async function puppeteerScrapper(website_link: string) {
           (td: { textContent: string }) => td.textContent === "Quantity"
         );
         const quantity = tds[brand_index + 1].querySelector("li");
-        return quantity ? quantity.textContent.trim() : null;
+        return quantity ? quantity.textContent.trim() : "N/A";
       });
 
       const ingredients = await page.$$eval("tr td", (tds: any[]) => {
@@ -92,7 +94,7 @@ export async function puppeteerScrapper(website_link: string) {
           (td: { textContent: string }) => td.textContent === "Ingredients"
         );
         const ingredients = tds[brand_index + 1].querySelector("li");
-        return ingredients ? ingredients.textContent.trim() : null;
+        return ingredients ? ingredients.textContent.trim() : "N/A";
       });
 
       const nutritions = await page.$$eval("tr td", (tds: any[]) => {
@@ -100,7 +102,7 @@ export async function puppeteerScrapper(website_link: string) {
           (td: { textContent: string }) => td.textContent === "Nutrient Content"
         );
         const nutritions = tds[brand_index + 1].querySelector("li");
-        return nutritions ? nutritions.textContent.trim() : null;
+        return nutritions ? nutritions.textContent.trim() : "N/A";
       });
 
       const veg_non_veg = await page.$$eval("tr td", (tds: any[]) => {
@@ -108,7 +110,7 @@ export async function puppeteerScrapper(website_link: string) {
           (td: { textContent: string }) => td.textContent === "Food Preference"
         );
         const veg_non_veg = tds[brand_index + 1].querySelector("li");
-        return veg_non_veg ? veg_non_veg.textContent.trim() : null;
+        return veg_non_veg ? veg_non_veg.textContent.trim() : "N/A";
       });
 
       productInfo.push({
