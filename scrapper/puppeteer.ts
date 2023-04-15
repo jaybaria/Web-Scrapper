@@ -94,7 +94,10 @@ export async function puppeteerScrapper(website_link: string) {
           (td: { textContent: string }) => td.textContent === "Ingredients"
         );
         const ingredients = tds[brand_index + 1].querySelector("li");
-        return ingredients ? ingredients.textContent.trim() : "N/A";
+        const formatted_ingredients = ingredients
+          ? ingredients.textContent.trim().replace(/[\n\r]+/g, ", ")
+          : "N/A";
+        return formatted_ingredients === "NA" ? "N/A" : formatted_ingredients;
       });
 
       const nutritions = await page.$$eval("tr td", (tds: any[]) => {
@@ -102,7 +105,10 @@ export async function puppeteerScrapper(website_link: string) {
           (td: { textContent: string }) => td.textContent === "Nutrient Content"
         );
         const nutritions = tds[brand_index + 1].querySelector("li");
-        return nutritions ? nutritions.textContent.trim() : "N/A";
+        const formatted_nutritions = nutritions
+          ? nutritions.textContent.trim().replace(/[\n\r]+/g, ", ")
+          : "N/A";
+        return formatted_nutritions === "NA" ? "N/A" : formatted_nutritions;
       });
 
       const veg_non_veg = await page.$$eval("tr td", (tds: any[]) => {
@@ -110,7 +116,10 @@ export async function puppeteerScrapper(website_link: string) {
           (td: { textContent: string }) => td.textContent === "Food Preference"
         );
         const veg_non_veg = tds[brand_index + 1].querySelector("li");
-        return veg_non_veg ? veg_non_veg.textContent.trim() : "N/A";
+        const formated_veg_non_veg = veg_non_veg
+          ? veg_non_veg.textContent.trim().replace(/[\n\r]+/g, ", ")
+          : "N/A";
+        return formated_veg_non_veg === "NA" ? "N/A" : formated_veg_non_veg;
       });
 
       productInfo.push({
