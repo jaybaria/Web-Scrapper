@@ -23,8 +23,8 @@ export async function dataFetcher(page: any) {
         !href.includes("/grocery/packaged-food/pr?")
       );
     });
-    // limited to only 2 hrefs for testing
     const unique_hrefs = Array.from(new Set(filtered_hrefs));
+    //  Set number of records to be Fetched
     return unique_hrefs; //.slice(0, 5);
   }, href_strings);
   // Create an array to store the product information
@@ -128,21 +128,26 @@ export async function dataFetcher(page: any) {
 }
 
 export async function puppeteerScrapper(website_link: string) {
-  // Launch the browser
-  const browser = await puppeteer.launch({
-    headless: false, // Run Puppeteer in headless mode
-    defaultViewport: null, // Set the viewport size to null
-  });
+  try {
+    // Launch the browser
+    const browser = await puppeteer.launch({
+      headless: false,
+      defaultViewport: null,
+    });
 
-  const page = await browser.newPage();
-  await page.goto(website_link);
+    const page = await browser.newPage();
+    await page.goto(website_link);
 
-  // Inserting the pin-code to check for delivery serviceability
-  const input_field = await page.waitForSelector("input._166SQN");
-  await input_field.type("400001");
-  await page.keyboard.press("Enter");
-  await page.waitForTimeout(5000);
-  // await page.setDefaultNavigationTimeout(40000);
-  const result = await dataFetcher(page);
-  return result;
+    // Inserting the pin-code to check for delivery serviceability
+    const input_field = await page.waitForSelector("input._166SQN");
+    await input_field.type("400001");
+    await page.keyboard.press("Enter");
+    await page.waitForTimeout(5000);
+    // await page.setDefaultNavigationTimeout(40000);
+    const result = await dataFetcher(page);
+    return result;
+  } catch (error) {
+    console.log("Got Error While Initializing Puppeteer", error);
+    throw error;
+  }
 }

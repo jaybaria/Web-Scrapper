@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { input_schema, number_validation } from "./validation";
 import { puppeteerScrapper } from "./puppeteer";
 import { getAllProducts, getProductById, insertProductInfo } from "./models";
+import { sendSuccess } from "../utils/response";
 
 export async function scrapeProductDetails(req: Request, res: Response) {
   try {
@@ -17,7 +18,7 @@ export async function scrapeProductDetails(req: Request, res: Response) {
 
     await insertProductInfo(products.productInfo);
 
-    return res.status(200).json(products.productInfo);
+    return sendSuccess(200, res, products.productInfo);
   } catch (error) {
     console.error(`Got Error Inserting Product Details: ${error}`);
     res.status(500).json({ error: "Something went wrong!" });
@@ -27,7 +28,7 @@ export async function scrapeProductDetails(req: Request, res: Response) {
 export async function readAllProducts(req: Request, res: Response) {
   try {
     const products = await getAllProducts();
-    return res.json(products);
+    return sendSuccess(200, res, products);
   } catch (error) {
     console.error(`Got Error While Reading All Products: ${error}`);
     res.status(500).json({ error: "Something went wrong!" });
