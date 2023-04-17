@@ -1,25 +1,11 @@
 import { ProductInfo } from "./models";
 const puppeteer = require("puppeteer");
 
-export async function puppeteerScrapper(website_link: string) {
-  // Launch the browser
-  const browser = await puppeteer.launch({
-    headless: true, // Run Puppeteer in headless mode
-    defaultViewport: null, // Set the viewport size to null
-  });
-
-  const page = await browser.newPage();
-  await page.goto(website_link);
-
-  // Inserting the pin-code to check for delivery serviceability
-  const input_field = await page.waitForSelector("input._166SQN");
-  await input_field.type("400001");
-  await page.keyboard.press("Enter");
-  await page.waitForTimeout(15000);
-  await page.setDefaultNavigationTimeout(40000);
-
+export async function dataFetcher(page: any) {
   // Find all href links
-  const href_elements = await page.$$('div[class^="_1AtVbE col-12-12"] a');
+  const href_elements = await page.$$(
+    "div._1YokD2._3Mn1Gg.col-12-12 div._1AtVbE.col-12-12 a"
+  );
   const hrefs = await Promise.all(
     href_elements.map((el: { getProperty: (arg0: string) => any }) =>
       el.getProperty("href")
@@ -39,9 +25,8 @@ export async function puppeteerScrapper(website_link: string) {
     });
     // limited to only 2 hrefs for testing
     const unique_hrefs = Array.from(new Set(filtered_hrefs));
-    return unique_hrefs.slice(0, 5);
+    return unique_hrefs; //.slice(0, 5);
   }, href_strings);
-
   // Create an array to store the product information
   const productInfo: ProductInfo[] = [];
 
@@ -61,7 +46,7 @@ export async function puppeteerScrapper(website_link: string) {
       let description;
       try {
         description = await page.$eval(
-          "div._1mXcCf",
+          "div._1mXcCf, _1mXcCf RmoJUa",
           (el: { textContent: string }) => el.textContent.trim()
         );
       } catch (error) {
@@ -139,7 +124,25 @@ export async function puppeteerScrapper(website_link: string) {
     }
   }
 
-  await browser.close();
-
   return { productInfo };
+}
+
+export async function puppeteerScrapper(website_link: string) {
+  // Launch the browser
+  const browser = await puppeteer.launch({
+    headless: false, // Run Puppeteer in headless mode
+    defaultViewport: null, // Set the viewport size to null
+  });
+
+  const page = await browser.newPage();
+  await page.goto(website_link);
+
+  // Inserting the pin-code to check for delivery serviceability
+  const input_field = await page.waitForSelector("input._166SQN");
+  await input_field.type("400001");
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(5000);
+  // await page.setDefaultNavigationTimeout(40000);
+  const result = await dataFetcher(page);
+  return result;
 }

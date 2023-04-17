@@ -33,7 +33,7 @@ router.get("/api/products/:id", getProductByID);
  *             properties:
  *               website_link:
  *                 type: string
- *                 example: "https://www.google.com"
+ *                 example: "https://www.flipkart.com/search?q=Pasta&otracker=search&otracker1=search&marketplace=GROCERY&as-show=on&as=off"
  *     responses:
  *       201:
  *         description: Successfully Fetched Data.
