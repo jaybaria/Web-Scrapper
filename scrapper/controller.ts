@@ -2,18 +2,18 @@ import { Request, Response } from "express";
 import { input_schema, number_validation } from "./validation";
 import { puppeteerScrapper } from "./puppeteer";
 import { getAllProducts, getProductById, insertProductInfo } from "./models";
-import { sendSuccess } from "../utils/response";
+import { sendError, sendSuccess } from "../utils/response";
 
 export async function scrapeProductDetails(req: Request, res: Response) {
   try {
     const { error, value } = input_schema.validate(req.body);
     if (error) {
-      return res.status(400).json(error.details[0].message);
+      return sendError(400, res, error.details[0].message);
     }
 
     const products = await puppeteerScrapper(value.website_link);
     if (!products) {
-      return res.status(400).json("Unable to Scrape Data");
+      return sendError(400, res, "Got Empty Response After Scraped Data");
     }
 
     await insertProductInfo(products.productInfo);
@@ -21,7 +21,11 @@ export async function scrapeProductDetails(req: Request, res: Response) {
     return sendSuccess(200, res, products.productInfo);
   } catch (error) {
     console.error(`Got Error Inserting Product Details: ${error}`);
-    res.status(500).json({ error: "Something went wrong!" });
+    return sendError(
+      500,
+      res,
+      "Got Internal Server Error While Scrapping Data"
+    );
   }
 }
 
@@ -31,7 +35,11 @@ export async function readAllProducts(req: Request, res: Response) {
     return sendSuccess(200, res, products);
   } catch (error) {
     console.error(`Got Error While Reading All Products: ${error}`);
-    res.status(500).json({ error: "Something went wrong!" });
+    return sendError(
+      500,
+      res,
+      "Got Internal Server Error While Fetching All Products"
+    );
   }
 }
 
@@ -39,17 +47,21 @@ export async function getProductByID(req: Request, res: Response) {
   try {
     const { error } = number_validation.validate(req.params);
     if (error) {
-      return res.status(400).json({ error: error.details[0].message });
+      return sendError(400, res, error.details[0].message);
     }
     const id = parseInt(req.params.id);
     const product = await getProductById(id);
     if (!product) {
-      return res.status(400).send("Unable to Find Product");
+      return sendError(400, res, "Product not found");
     }
     return res.status(200).json(product);
   } catch (error) {
     console.error(`Error fetching product: ${error}`);
-    return res.status(500).send("Internal server error");
+    return sendError(
+      500,
+      res,
+      "Got Internal server error while Fetching Product By Id"
+    );
   }
 }
 

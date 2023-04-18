@@ -108,6 +108,7 @@ export async function puppeteerScrapper(website_link: string) {
     await page.waitForTimeout(5000);
     // await page.setDefaultNavigationTimeout(40000);
     const result = await dataFetcher(page);
+    await browser.close();
     return result;
   } catch (error) {
     console.log("Got Error While Initializing Puppeteer", error);
