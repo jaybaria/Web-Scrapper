@@ -1,6 +1,6 @@
 import express, { Application } from "express";
 import swaggerUI from "swagger-ui-express";
-import * as swaggerSpec from "./swagger";
+import * as swaggerSpec from "./utils/swagger";
 import bodyParser from "body-parser";
 import routes from "./scrapper";
 import { connectToDatabase } from "./scrapper/db_connection";

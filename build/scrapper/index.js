@@ -1,23 +1,17 @@
-import { Router } from "express";
-import {
-  getProductByID,
-  readAllProducts,
-  scrapeProductDetails,
-} from "./controller";
-
-const router = Router();
-
-router.post("/api/products", scrapeProductDetails);
-router.get("/api/products/all", readAllProducts);
-router.get("/api/products/:id", getProductByID);
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const controller_1 = require("./controller");
+const router = (0, express_1.Router)();
+router.post("/api/products", controller_1.scrapeProductDetails);
+router.get("/api/products/all", controller_1.readAllProducts);
+router.get("/api/products/:id", controller_1.getProductByID);
 /**
  * @swagger
  * tags:
  *   name: Products
  *   description: API's for retrieving food product information
  */
-
 /**
  * @swagger
  * /api/products:
@@ -44,7 +38,6 @@ router.get("/api/products/:id", getProductByID);
  *       500:
  *         description: Internal server error. An unexpected error occurred while processing the request.
  */
-
 /**
  * @swagger
  * /api/products/all:
@@ -61,7 +54,6 @@ router.get("/api/products/:id", getProductByID);
  *       500:
  *         description: Internal server error. An unexpected error occurred while processing the request.
  */
-
 /**
  * @swagger
  * /api/products/{id}:
@@ -85,5 +77,4 @@ router.get("/api/products/:id", getProductByID);
  *       500:
  *         description: Internal server error. An unexpected error occurred while processing the request.
  */
-
-export default router;
+exports.default = router;
